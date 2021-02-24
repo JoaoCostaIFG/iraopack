@@ -1,0 +1,1 @@
+give @p carrot_on_a_stick{display:{Name:'{"text":"Pokebalde","color":"red","bold":true}'},HideFlags:5,Unbreakable:1b,CustomModelData:134279,pokebalde:1b,Enchantments:[{id:"minecraft:silk_touch",lvl:1s}]} 1

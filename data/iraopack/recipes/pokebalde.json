@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "RER",
+    "IEI",
+    "WIW"
+  ],
+  "key": {
+    "I": {
+      "item": "minecraft:iron_ingot"
+    },
+    "E": {
+      "item": "minecraft:ender_pearl"
+    },
+    "W": {
+      "item": "minecraft:white_wool"
+    },
+    "R": {
+      "item": "minecraft:red_wool"
+    }
+  },
+  "result": {
+    "item": "minecraft:carrot_on_a_stick",
+    "nbt": "{display:{Name:'{\"text\":\"Pokebalde\",\"color\":\"red\",\"bold\":true}'},HideFlags:5,Unbreakable:1b,CustomModelData:134279,pokebalde:1b,Enchantments:[{id:\"minecraft:silk_touch\",lvl:1s}]}"
+  }
+}
