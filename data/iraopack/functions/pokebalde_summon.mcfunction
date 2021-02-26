@@ -13,9 +13,6 @@ data remove storage iraopack:capture Entity.Pos
 data remove storage iraopack:capture Entity.Motion
 data remove storage iraopack:capture Entity.Rotation
 
-# Make the original mob go poof, silently with no loot dropped
-data merge entity @s {Silent:1b,DeathTime:19s,DeathLootTable:"",Health:0f}
-
 # create the egg based on entity type
 execute if entity @s[type=minecraft:bat] at @s run summon minecraft:item ~ ~ ~ {Tags:["pokebalde_egg"],Item:{id:"minecraft:bat_spawn_egg",Count:1b,tag:{pokebalde_spawnegg:1b}}}
 execute if entity @s[type=minecraft:bee] at @s run summon minecraft:item ~ ~ ~ {Tags:["pokebalde_egg"],Item:{id:"minecraft:bee_spawn_egg",Count:1b,tag:{pokebalde_spawnegg:1b}}}
@@ -46,6 +43,10 @@ execute if entity @s[type=minecraft:trader_llama] at @s run summon minecraft:ite
 execute if entity @s[type=minecraft:tropical_fish] at @s run summon minecraft:item ~ ~ ~ {Tags:["pokebalde_egg"],Item:{id:"minecraft:tropical_fish_spawn_egg",Count:1b,tag:{pokebalde_spawnegg:1b}}}
 execute if entity @s[type=minecraft:turtle] at @s run summon minecraft:item ~ ~ ~ {Tags:["pokebalde_egg"],Item:{id:"minecraft:turtle_spawn_egg",Count:1b,tag:{pokebalde_spawnegg:1b}}}
 execute if entity @s[type=minecraft:wolf] at @s run summon minecraft:item ~ ~ ~ {Tags:["pokebalde_egg"],Item:{id:"minecraft:wolf_spawn_egg",Count:1b,tag:{pokebalde_spawnegg:1b}}}
+
+# make the original mob go poof, silently with no loot dropped
+tp @s ~ ~-227 ~
+data merge entity @s {Silent:1b,DeathTime:19s,DeathLootTable:"",Health:0f}
 
 # save the data on it (dunno why but needs delay)
 schedule function iraopack:pokebalde_copy 1t
