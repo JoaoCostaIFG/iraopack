@@ -1,0 +1,13 @@
+{
+  "criteria": {
+    "Unlocked": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "irao_portals:iraoportalrecipe"
+      }
+    }
+  },
+  "rewards": {
+    "function": "irao_portals:recipe"
+  }
+}

@@ -1,0 +1,17 @@
+namespace irao_portals
+
+tag irao_portal
+
+function load #minecraft:load {
+  /tellraw @a [{"text": "[IraoPortals]: yellow"}]
+}
+
+function loop #minecraft:tick {
+  /recipe take @a irao_portals:iraoportalrecipe
+  /advancement revoke @a only irao_portals:iraoportalrecipeadv
+}
+
+function recipe() {
+  /give @s painting{display:{Name:'{"text":"Irao portal","color":"dark_aqua","bold":true,"italic":true}'}} 1
+  /clear @s minecraft:knowledge_book 1
+}
