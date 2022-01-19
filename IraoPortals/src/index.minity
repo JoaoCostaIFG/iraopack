@@ -1,6 +1,8 @@
 namespace irao_portals
 
-tag irao_portal
+tag iraoPortalMarker
+tag placedPortal
+tag iraoPortal
 
 function load #minecraft:load {
   /tellraw @a [{"text": "[IraoPortals]: yellow"}]
@@ -9,9 +11,82 @@ function load #minecraft:load {
 function loop #minecraft:tick {
   /recipe take @a irao_portals:iraoportalrecipe
   /advancement revoke @a only irao_portals:iraoportalrecipeadv
+  
+  for @e.iraoPortalMarker!placedPortal {
+    place_portal()
+  }
 }
 
+macro summon_painting(?motive="minecraft:kebab") {
+  var $facingdir
+  $facingdir = @s::Facing
+
+  if ($facingdir == 2) {
+    summon ~ ~ ~ painting{
+      Motive: ?motive,
+      Facing: 2b,
+      Tags:["{.iraoPortal}"]
+    }
+  } else {
+    if ($facingdir == 3) {
+      summon ~ ~ ~ painting{
+        Motive: ?motive,
+        Facing: 0b,
+        Tags:["{.iraoPortal}"]
+      }
+    } else {
+      if ($facingdir == 4) {
+        summon ~ ~ ~ painting{
+          Motive: ?motive,
+          Facing: 1b,
+          Tags:["{.iraoPortal}"]
+        }
+      } else {
+        if ($facingdir == 5) {
+          summon ~ ~ ~ painting{
+            Motive: ?motive,
+            Facing: 3b,
+            Tags:["{.iraoPortal}"]
+          }
+        } else {
+          /kill @s
+        }
+      }
+    }
+  }
+}
+
+function place_portal() {
+  say Placing portal
+
+  /tp @s ~ ~2 ~
+
+  summon_painting("minecraft:aztec2")
+  @s::Frien = nearest @e.iraoPortal::UUID
+  /tp @s ~ ~ ~
+
+  tag @s placedPortal
+  say Placed portal
+}
+
+// Recipes
 function recipe() {
-  /give @s painting{display:{Name:'{"text":"Irao portal","color":"dark_aqua","bold":true,"italic":true}'}} 1
+  give @p glow_item_frame{
+    display: {
+      Name: json <span color=aqua italic=true bold=true>Irao Portal</span>,
+    },
+    EntityTag: {
+      Silent:1b,
+      Invulnerable:1b,
+      Invisible:1b,
+      Fixed:1b,
+      Tags:["{.iraoPortalMarker}"],
+      Item: {
+        id:"minecraft:glow_item_frame",
+        Count:1b,
+        Name: json <span color=aqua italic=true bold=true>Irao Portal</span>,
+      }
+    }
+  }
   /clear @s minecraft:knowledge_book 1
 }
