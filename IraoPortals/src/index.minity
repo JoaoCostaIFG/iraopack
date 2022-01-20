@@ -95,7 +95,9 @@ macro summon_painting(?motive="minecraft:kebab") {
 function place_portal() {
   say Placing portal
 
-  // /tp @s ~ ~-227 ~
+  back 1 {
+    /tp @s ~ ~ ~
+  }
 
   var $uuid0
   var $uuid1
