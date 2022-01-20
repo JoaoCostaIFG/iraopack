@@ -17,6 +17,42 @@ function loop #minecraft:tick {
   }
 }
 
+macro area_feeler(?max_x, ?max_y) {
+  var $blockcount = 0
+  var $blockcount2 = 0
+
+  var $col = 0
+  down 1 east 1 {
+    repeat west 1 {
+      $col++
+      var $row = 0
+      repeat up 1 {
+        if (air) {
+          $blockcount++
+          // setblock stone
+        }
+        south 1 {
+          unless (air) {
+            $blockcount2++
+            // setblock stone
+          }
+        }
+        $row++
+      } while $row < ?max_y
+    } while $col < ?max_x
+  }
+
+  var $expected_tot = 0
+  $expected_tot += ?max_x
+  $expected_tot *= ?max_y
+
+  if ($blockcount == $expected_tot) and if ($blockcount2 == $expected_tot) {
+    resolve()
+  } else {
+    reject()
+  }
+}
+
 macro summon_painting(?motive="minecraft:kebab") {
   var $facingdir
   $facingdir = @s::Facing
@@ -59,11 +95,45 @@ macro summon_painting(?motive="minecraft:kebab") {
 function place_portal() {
   say Placing portal
 
-  /tp @s ~ ~2 ~
+  // /tp @s ~ ~-227 ~
 
-  summon_painting("minecraft:aztec2")
-  @s::Frien = nearest @e.iraoPortal::UUID
-  /tp @s ~ ~ ~
+  east 1 down 1 {
+    when area_feeler(4, 4) then {
+      west 1 up 1 {
+        summon_painting("minecraft:burning_skull")
+      }
+    } catch {
+      when area_feeler(4, 3) then {
+        west 1 up 1 {
+          summon_painting("minecraft:donkey_kong")
+        }
+      } catch {
+        up 1 {
+          when area_feeler(4, 2) then {
+            west 1 {
+              summon_painting("minecraft:fighters")
+            }
+          } catch {
+            west 1 {
+              when area_feeler(2, 2) then {
+                summon_painting("minecraft:void")
+              } catch {
+                when area_feeler(2, 1) then {
+                  summon_painting("minecraft:creebet")
+                } catch {
+                  when area_feeler(1, 2) then {
+                    summon_painting("minecraft:wanderer")
+                  } catch {
+                    summon_painting("minecraft:aztec2")
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
 
   tag @s placedPortal
   say Placed portal
