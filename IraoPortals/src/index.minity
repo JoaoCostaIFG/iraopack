@@ -22,8 +22,8 @@ macro area_feeler(?max_x, ?max_y) {
   var $blockcount2 = 0
 
   var $col = 0
-  down 1 east 1 {
-    repeat west 1 {
+  down 1 right 1 {
+    repeat left 1 {
       $col++
       var $row = 0
       repeat up 1 {
@@ -31,7 +31,7 @@ macro area_feeler(?max_x, ?max_y) {
           $blockcount++
           // setblock stone
         }
-        south 1 {
+        back 1 {
           unless (air) {
             $blockcount2++
             // setblock stone
@@ -97,34 +97,132 @@ function place_portal() {
 
   // /tp @s ~ ~-227 ~
 
-  east 1 down 1 {
+  var $uuid0
+  var $uuid1
+  var $uuid2
+  var $uuid3
+  $uuid0 = @s::UUID[0]
+  $uuid1 = @s::UUID[1]
+  $uuid2 = @s::UUID[2]
+  $uuid3 = @s::UUID[3]
+
+  var $rdm
+  $rdm =  $uuid0
+  $rdm += $uuid1
+  $rdm += $uuid2
+  $rdm += $uuid3
+
+  right 1 down 1 {
     when area_feeler(4, 4) then {
-      west 1 up 1 {
-        summon_painting("minecraft:burning_skull")
+      left 1 up 1 {
+        $rdm %= 3
+        if ($rdm == 0) {
+          summon_painting("minecraft:burning_skull")
+        } else {
+          if ($rdm == 1) {
+            summon_painting("minecraft:pigscene")
+          } else {
+            summon_painting("minecraft:pointer")
+          }
+        }
       }
     } catch {
       when area_feeler(4, 3) then {
-        west 1 up 1 {
-          summon_painting("minecraft:donkey_kong")
+        left 1 up 1 {
+          $rdm %= 2
+          if ($rdm == 0) {
+            summon_painting("minecraft:donkey_kong")
+          } else {
+            summon_painting("minecraft:skeleton")
+          }
         }
       } catch {
         up 1 {
           when area_feeler(4, 2) then {
-            west 1 {
+            left 1 {
+              // no random cause only 1 paiting available
               summon_painting("minecraft:fighters")
             }
           } catch {
-            west 1 {
+            left 1 {
               when area_feeler(2, 2) then {
-                summon_painting("minecraft:void")
+                $rdm %= 6
+                if ($rdm == 0) {
+                  summon_painting("minecraft:bust")
+                } else {
+                  if ($rdm == 1) {
+                    summon_painting("minecraft:match")
+                  } else {
+                    if ($rdm == 2) {
+                      summon_painting("minecraft:skull_and_roses")
+                    } else {
+                      if ($rdm == 3) {
+                        summon_painting("minecraft:stage")
+                      } else {
+                        if ($rdm == 4) {
+                          summon_painting("minecraft:void")
+                        } else {
+                          summon_painting("minecraft:wither")
+                        }
+                      }
+                    }
+                  }
+                }
               } catch {
-                when area_feeler(2, 1) then {
-                  summon_painting("minecraft:creebet")
-                } catch {
-                  when area_feeler(1, 2) then {
+                when area_feeler(1, 2) then {
+                  $rdm %= 2
+                  if ($rdm == 0) {
+                    summon_painting("minecraft:graham")
+                  } else {
                     summon_painting("minecraft:wanderer")
+                  }
+                } catch {
+                  when area_feeler(2, 1) then {
+                    $rdm %= 5
+                    if ($rdm == 0) {
+                      summon_painting("minecraft:courbet")
+                    } else {
+                      if ($rdm == 1) {
+                        summon_painting("minecraft:pool")
+                      } else {
+                        if ($rdm == 2) {
+                          summon_painting("minecraft:sea")
+                        } else {
+                          if ($rdm == 3) {
+                            summon_painting("minecraft:creebet")
+                          } else {
+                            summon_painting("minecraft:sunset")
+                          }
+                        }
+                      }
+                    }
                   } catch {
-                    summon_painting("minecraft:aztec2")
+                    $rdm %= 7
+                    if ($rdm == 0) {
+                      summon_painting("minecraft:alban")
+                    } else {
+                      if ($rdm == 1) {
+                        summon_painting("minecraft:aztec")
+                      } else {
+                        if ($rdm == 2) {
+                          summon_painting("minecraft:aztec2")
+                        } else {
+                          if ($rdm == 3) {
+                            summon_painting("minecraft:bomb")
+                          } else {
+                            if ($rdm == 4) {
+                              summon_painting("minecraft:kebab")
+                            } else {
+                              if ($rdm == 5) {
+                                summon_painting("minecraft:plant")
+                              } else {
+                                summon_painting("minecraft:wasteland")
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
                   }
                 }
               }
