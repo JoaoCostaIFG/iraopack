@@ -52,7 +52,6 @@ function linker_recipe() {
 }
 
 function place_portal() {
-  say Placing portal
   tag @s placedPortal
 
   var $rotx
@@ -79,13 +78,10 @@ function place_portal() {
     @s::Rotation[1] = 1f * $roty
     @s->roty = @s::Rotation[1]
   }
-
-  say Placed portal
 }
 
 function destroy_portal() {
   unless @painting.iraoPortal[distance < 1] {
-    say Portal died
     // kill painting drop
     /kill @e[type=minecraft:item,nbt={Item:{id:"minecraft:painting"}},sort=nearest,limit=1]
     // drop item
@@ -122,7 +118,6 @@ function teleport_player() {
 
     // for each neaby player
     for @p[distance <= 1] {
-      say looking for pair teleporter
       /tag @s add TeleportPlayer
       summon marker{
         Tags:["TeleportTarget"],
@@ -157,9 +152,9 @@ function handle_link() {
 
   if (@s->parity == 0) {
     // first portal
-    say looking for portal 0
     for nearest @marker.iraoPortalMarker[distance < 3][->portalid < 0] {
       $found = 1
+      /particle minecraft:happy_villager ~ ~ ~ 0.3 0.3 0.3 0.5 10 normal
 
       $posx = @s->posicaox
       $posy = @s->posicaoy
@@ -173,7 +168,6 @@ function handle_link() {
 
     if ($found == 1) {
       // found a portal
-      say found a portal 1
       @s->posicaox = $posx
       @s->posicaoy = $posy
       @s->posicaoz = $posz
@@ -185,7 +179,6 @@ function handle_link() {
   } else {
     if (@s->parity == 1) {
       // second portal
-      say looking for portal 1
       $posx = @s->posicaox
       $posy = @s->posicaoy
       $posz = @s->posicaoz
@@ -194,6 +187,8 @@ function handle_link() {
 
       for nearest @marker.iraoPortalMarker[distance < 3][->portalid < 0] {
         $found = 1
+        /particle minecraft:portal ~ ~ ~ 0 0 0 1 500 normal
+
         var $temp
 
         $temp = @s->posicaox
@@ -218,7 +213,6 @@ function handle_link() {
 
       if ($found == 1) {
         // found a portal
-        say found a portal 2
         @s->posicaox = $posx
         @s->posicaoy = $posy
         @s->posicaoz = $posz
@@ -229,8 +223,6 @@ function handle_link() {
       }
     } else {
       // final binding
-      say looking for portal 2
-
       $posx = @s->posicaox
       $posy = @s->posicaoy
       $posz = @s->posicaoz
@@ -240,6 +232,7 @@ function handle_link() {
       for nearest @marker.iraoPortalMarker[distance < 3] {
         if (@s->portalid == $seq) and if (@s->player == $playerid) {
           $found = 1
+          /particle minecraft:portal ~ ~ ~ 0 0 0 1 500 normal
 
           @s->posicaox = $posx
           @s->posicaoy = $posy
@@ -251,8 +244,6 @@ function handle_link() {
 
       if ($found == 1) {
         // found a portal
-        say found portal 3
-
         @s->portalseq += 1
         @s->parity = 0
       }
@@ -279,7 +270,6 @@ function load #minecraft:load {
 function loop #minecraft:tick {
   // uniquely identify all users
   for @a[->id = 0] {
-    say changing
     /scoreboard players operation @s {->id} = $total {->id}
     /scoreboard players add $total {->id} 1
   }
@@ -302,7 +292,6 @@ function loop #minecraft:tick {
   // portal linkage
   for @a[->clickdetect > 0]{SelectedItem:{id:"minecraft:carrot_on_a_stick",tag:{EntityTag:{Tags:["{.iraoPortalLinker}"]}}}} {
     if (@s->sneaking > 0) {
-      say resetting
       @s->parity = 0
     } else {
       handle_link()
