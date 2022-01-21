@@ -6,7 +6,7 @@ Portals made of minecraft paintings.
 
 - Use marker instead of area of effects `[x]`
 - Use normal paintings instead of summoning them `[x]`
+- Deal with unloaded chunks `[x]`
+- Multiple portal tunnels `[x]`
+- Set player rotation when getting out `[x]`
 - Teleport between dimensions `[ ]`
-- Deal with unloaded chunks `[ ]`
-- Multiple portal tunnels `[ ]`
-- Set player rotation when getting out `[ ]`
