@@ -1,276 +1,78 @@
 namespace irao_portals
 
-tag iraoPortalMarker
-tag placedPortal
 tag iraoPortal
+tag placedPortal
+tag iraoPortalMarker
 
-score parity
 score id
 score posicaox
 score posicaoy
 score posicaoz
 
-macro area_feeler(?max_x, ?max_y) {
-  var $blockcount = 0
-  var $blockcount2 = 0
-
-  var $col = 0
-  down 1 right 1 {
-    repeat left 1 {
-      $col++
-      var $row = 0
-      repeat up 1 {
-        if (air) {
-          $blockcount++
-          // setblock stone
-        }
-        back 1 {
-          unless (air) {
-            $blockcount2++
-            // setblock stone
-          }
-        }
-        $row++
-      } while $row < ?max_y
-    } while $col < ?max_x
-  }
-
-  var $expected_tot = 0
-  $expected_tot += ?max_x
-  $expected_tot *= ?max_y
-
-  if ($blockcount == $expected_tot) and if ($blockcount2 == $expected_tot) {
-    resolve()
-  } else {
-    reject()
-  }
-}
-
-macro summon_painting(?motive="minecraft:kebab") {
-  var $facingdir
-  $facingdir = @s::Facing
-
-  if ($facingdir == 2) {
-    summon ~ ~ ~ painting{
-      Motive: ?motive,
-      Facing: 2b,
-      Tags:["{.iraoPortal}"]
-    }
-  } else {
-    if ($facingdir == 3) {
-      summon ~ ~ ~ painting{
-        Motive: ?motive,
-        Facing: 0b,
-        Tags:["{.iraoPortal}"]
-      }
-    } else {
-      if ($facingdir == 4) {
-        summon ~ ~ ~ painting{
-          Motive: ?motive,
-          Facing: 1b,
-          Tags:["{.iraoPortal}"]
-        }
-      } else {
-        if ($facingdir == 5) {
-          summon ~ ~ ~ painting{
-            Motive: ?motive,
-            Facing: 3b,
-            Tags:["{.iraoPortal}"]
-          }
-        } else {
-          /kill @s
-        }
-      }
-    }
-  }
-}
-
-function place_portal() {
-  say Placing portal
-
-  // save portal info
-  forward 1 {
-    /tp @s ~ ~ ~
-    @s->id = 0
-    @s->posicaox = @s::Pos[0]
-    @s->posicaoy = @s::Pos[1]
-    @s->posicaoz = @s::Pos[2]
-  }
-
-  back 1 {
-    /tp @s ~ ~ ~
-  }
-
-  var $uuid0
-  var $uuid1
-  var $uuid2
-  var $uuid3
-  $uuid0 = @s::UUID[0]
-  $uuid1 = @s::UUID[1]
-  $uuid2 = @s::UUID[2]
-  $uuid3 = @s::UUID[3]
-
-  var $rdm
-  $rdm =  $uuid0
-  $rdm += $uuid1
-  $rdm += $uuid2
-  $rdm += $uuid3
-
-  right 1 down 1 {
-    when area_feeler(4, 4) then {
-      left 1 up 1 {
-        $rdm %= 3
-        if ($rdm == 0) {
-          summon_painting("minecraft:burning_skull")
-        } else {
-          if ($rdm == 1) {
-            summon_painting("minecraft:pigscene")
-          } else {
-            summon_painting("minecraft:pointer")
-          }
-        }
-      }
-    } catch {
-      when area_feeler(4, 3) then {
-        left 1 up 1 {
-          $rdm %= 2
-          if ($rdm == 0) {
-            summon_painting("minecraft:donkey_kong")
-          } else {
-            summon_painting("minecraft:skeleton")
-          }
-        }
-      } catch {
-        up 1 {
-          when area_feeler(4, 2) then {
-            left 1 {
-              // no random cause only 1 painting available
-              summon_painting("minecraft:fighters")
-            }
-          } catch {
-            left 1 {
-              when area_feeler(2, 2) then {
-                $rdm %= 6
-                if ($rdm == 0) {
-                  summon_painting("minecraft:bust")
-                } else {
-                  if ($rdm == 1) {
-                    summon_painting("minecraft:match")
-                  } else {
-                    if ($rdm == 2) {
-                      summon_painting("minecraft:skull_and_roses")
-                    } else {
-                      if ($rdm == 3) {
-                        summon_painting("minecraft:stage")
-                      } else {
-                        if ($rdm == 4) {
-                          summon_painting("minecraft:void")
-                        } else {
-                          summon_painting("minecraft:wither")
-                        }
-                      }
-                    }
-                  }
-                }
-              } catch {
-                when area_feeler(1, 2) then {
-                  $rdm %= 2
-                  if ($rdm == 0) {
-                    summon_painting("minecraft:graham")
-                  } else {
-                    summon_painting("minecraft:wanderer")
-                  }
-                } catch {
-                  when area_feeler(2, 1) then {
-                    $rdm %= 5
-                    if ($rdm == 0) {
-                      summon_painting("minecraft:courbet")
-                    } else {
-                      if ($rdm == 1) {
-                        summon_painting("minecraft:pool")
-                      } else {
-                        if ($rdm == 2) {
-                          summon_painting("minecraft:sea")
-                        } else {
-                          if ($rdm == 3) {
-                            summon_painting("minecraft:creebet")
-                          } else {
-                            summon_painting("minecraft:sunset")
-                          }
-                        }
-                      }
-                    }
-                  } catch {
-                    $rdm %= 7
-                    if ($rdm == 0) {
-                      summon_painting("minecraft:alban")
-                    } else {
-                      if ($rdm == 1) {
-                        summon_painting("minecraft:aztec")
-                      } else {
-                        if ($rdm == 2) {
-                          summon_painting("minecraft:aztec2")
-                        } else {
-                          if ($rdm == 3) {
-                            summon_painting("minecraft:bomb")
-                          } else {
-                            if ($rdm == 4) {
-                              summon_painting("minecraft:kebab")
-                            } else {
-                              if ($rdm == 5) {
-                                summon_painting("minecraft:plant")
-                              } else {
-                                summon_painting("minecraft:wasteland")
-                              }
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-
-  tag @s placedPortal
-  say Placed portal
-}
-
 // Recipes
 function recipe() {
-  give @p glow_item_frame{
+  give @p painting{
     display: {
       Name: json <span color=aqua bold=true>Irao Portal</span>,
     },
     EntityTag: {
-      Silent:1b,
-      Invulnerable:1b,
-      Invisible:1b,
-      Fixed:1b,
-      Tags:["{.iraoPortalMarker}"],
+      Tags:["{.iraoPortal}"],
     }
   }
   /clear @s minecraft:knowledge_book 1
 }
 
-function destroy_portal() {
-  forward 1 {
-    /tp @s ~ ~ ~
-    unless @painting.iraoPortal[distance < 1] {
-      say Portal died
-      /kill @s
-      // kill painting drop
-      /kill @e[type=minecraft:item,nbt={Item:{id:"minecraft:painting"}},sort=nearest,limit=1]
-      // drop item
-      recipe()
+function place_portal() {
+  say Placing portal
+  tag @s placedPortal
+
+  var $rotx
+  $rotx = @s::Rotation[0]
+  var $roty
+  $roty = @s::Rotation[1]
+
+  // save portal info
+  summon (forward 0.5) marker{
+    // do nothing
+  } then {
+    tag @s iraoPortalMarker
+    @s->id = -1
+    forward 1 {
+      /tp @s ~ ~ ~
+      @s->posicaox = @s::Pos[0]
+      @s->posicaoy = @s::Pos[1]
+      @s->posicaoz = @s::Pos[2]
     }
+    /tp @s ~ ~ ~
+    @s::Rotation[0] = 1f * $rotx
+    @s::Rotation[1] = 1f * $roty
   }
-  /tp @s ~ ~ ~
+
+  say Placed portal
+}
+
+function destroy_portal() {
+  unless @painting.iraoPortal[distance < 1] {
+    say Portal died
+    // kill painting drop
+    /kill @e[type=minecraft:item,nbt={Item:{id:"minecraft:painting"}},sort=nearest,limit=1]
+    // drop item
+    summon (forward 0.5 downward 0.5) item{
+      Item: {
+        id: "minecraft:painting",
+        Count: 1b,
+        tag: {
+          display: {
+            Name: json <span color=aqua bold=true>Irao Portal</span>,
+          },
+          EntityTag: {
+            Tags:["{.iraoPortal}"],
+          }
+        }
+      }
+    }
+    /kill @s
+  }
 }
 
 function teleport_player() {
@@ -278,11 +80,12 @@ function teleport_player() {
   $myid = @s->id
 
   // for each neaby player
-  for @p[distance <= 2] {
+  for @p[distance <= 1] {
+    say looking for pair teleporter
     /tag @s add TeleportPlayer
 
     // loop through all paintings (loaded chunks)
-    as(furthest @glow_item_frame.iraoPortalMarker.placedPortal[distance > 2]) {
+    as(furthest @marker.iraoPortalMarker[distance > 1]) {
       // if the ids match, we teleport
       if ($myid == @s->id) {
         var $posx
@@ -292,13 +95,10 @@ function teleport_player() {
         var $posz
         $posz = @s->posicaoz
 
-        say looking for pair teleporter
 
-        summon area_effect_cloud{
+        summon marker{
           Tags:["TeleportTarget"],
-          Duration:1
         } then {
-          say tp
           @s::Pos[0] = 1d * $posx
           @s::Pos[1] = 1d * $posy
           @s::Pos[2] = 1d * $posz
@@ -313,9 +113,6 @@ function teleport_player() {
 
 // Load
 function load #minecraft:load {
-  // ensure the scoreboard is instantiated
-  @s->parity = 0
-
   /tellraw @a [{"text": "[IraoPortals]: yellow"}]
 }
 
@@ -324,11 +121,11 @@ function loop #minecraft:tick {
   /recipe take @a irao_portals:iraoportalrecipe
   /advancement revoke @a only irao_portals:iraoportalrecipeadv
   
-  for @glow_item_frame.iraoPortalMarker!placedPortal {
+  for @painting.iraoPortal!placedPortal {
     place_portal()
   }
 
-  for @glow_item_frame.iraoPortalMarker.placedPortal {
+  for @marker.iraoPortalMarker {
     destroy_portal()
     teleport_player()
   }
