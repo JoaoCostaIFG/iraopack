@@ -14,6 +14,7 @@ data remove storage iraopack:capture Entity.Motion
 data remove storage iraopack:capture Entity.Rotation
 
 # create the egg based on entity type
+execute if entity @s[type=minecraft:axolotl] at @s run summon minecraft:item ~ ~ ~ {Tags:["pokebalde_egg"],Item:{id:"minecraft:axolotl_spawn_egg",Count:1b,tag:{pokebalde_spawnegg:1b}}}
 execute if entity @s[type=minecraft:bat] at @s run summon minecraft:item ~ ~ ~ {Tags:["pokebalde_egg"],Item:{id:"minecraft:bat_spawn_egg",Count:1b,tag:{pokebalde_spawnegg:1b}}}
 execute if entity @s[type=minecraft:bee] at @s run summon minecraft:item ~ ~ ~ {Tags:["pokebalde_egg"],Item:{id:"minecraft:bee_spawn_egg",Count:1b,tag:{pokebalde_spawnegg:1b}}}
 execute if entity @s[type=minecraft:cat] at @s run summon minecraft:item ~ ~ ~ {Tags:["pokebalde_egg"],Item:{id:"minecraft:cat_spawn_egg",Count:1b,tag:{pokebalde_spawnegg:1b}}}
