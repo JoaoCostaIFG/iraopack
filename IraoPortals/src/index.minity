@@ -3,11 +3,21 @@ namespace irao_portals
 tag iraoPortal
 tag placedPortal
 tag iraoPortalMarker
+tag iraoPortalLinker
 
+// player scores
 score id
+score portalseq
+score parity
+score clickdetect minecraft.used:minecraft.carrot_on_a_stick
+
+score portalid
+score player
 score posicaox
 score posicaoy
 score posicaoz
+score rotx
+score roty
 
 // Recipes
 function recipe() {
@@ -17,6 +27,18 @@ function recipe() {
     },
     EntityTag: {
       Tags:["{.iraoPortal}"],
+    }
+  }
+  /clear @s minecraft:knowledge_book 1
+}
+
+function linker_recipe() {
+  give @p carrot_on_a_stick{
+    display: {
+      Name: json <span color=aqua bold=true>Irao Portal Linker</span>,
+    },
+    EntityTag: {
+      Tags:["{.iraoPortalLinker}"],
     }
   }
   /clear @s minecraft:knowledge_book 1
@@ -36,7 +58,8 @@ function place_portal() {
     // do nothing
   } then {
     tag @s iraoPortalMarker
-    @s->id = -1
+    @s->portalid = -1
+    @s->player = 0
     forward 1 {
       /tp @s ~ ~ ~
       @s->posicaox = @s::Pos[0]
@@ -45,7 +68,9 @@ function place_portal() {
     }
     /tp @s ~ ~ ~
     @s::Rotation[0] = 1f * $rotx
+    @s->rotx = @s::Rotation[0]
     @s::Rotation[1] = 1f * $roty
+    @s->roty = @s::Rotation[1]
   }
 
   say Placed portal
@@ -76,57 +101,199 @@ function destroy_portal() {
 }
 
 function teleport_player() {
-  var $myid
-  $myid = @s->id
+  if (@s->portalid > 0) {
+    var $posx
+    $posx = @s->posicaox
+    var $posy
+    $posy = @s->posicaoy
+    var $posz
+    $posz = @s->posicaoz
+    var $rotx
+    $rotx = @s->rotx
+    var $roty
+    $roty = @s->roty
 
-  // for each neaby player
-  for @p[distance <= 1] {
-    say looking for pair teleporter
-    /tag @s add TeleportPlayer
-
-    // loop through all paintings (loaded chunks)
-    as(furthest @marker.iraoPortalMarker[distance > 1]) {
-      // if the ids match, we teleport
-      if ($myid == @s->id) {
-        var $posx
-        $posx = @s->posicaox
-        var $posy
-        $posy = @s->posicaoy
-        var $posz
-        $posz = @s->posicaoz
-
-
-        summon marker{
-          Tags:["TeleportTarget"],
-        } then {
-          @s::Pos[0] = 1d * $posx
-          @s::Pos[1] = 1d * $posy
-          @s::Pos[2] = 1d * $posz
-          /tp @a[tag=TeleportPlayer, limit=1] @s
-          /tag @a[tag=TeleportPlayer, limit=1] remove TeleportPlayer
-          /kill @s
-        }
+    // for each neaby player
+    for @p[distance <= 1] {
+      say looking for pair teleporter
+      /tag @s add TeleportPlayer
+      summon marker{
+        Tags:["TeleportTarget"],
+      } then {
+        @s::Pos[0] = 1d * $posx
+        @s::Pos[1] = 1d * $posy
+        @s::Pos[2] = 1d * $posz
+        @s::Rotation[0] = 1f * $rotx
+        @s::Rotation[1] = 1f * $roty
+        /tp @a[tag=TeleportPlayer, limit=1] @s
+        /tag @a[tag=TeleportPlayer, limit=1] remove TeleportPlayer
+        /kill @s
       }
     }
   }
 }
 
+function handle_link() {
+  var $seq
+  $seq = @s->portalseq
+  var $playerid
+  $playerid = @s->id
+
+  var $posx
+  var $posy
+  var $posz
+  var $rotx
+  var $roty
+
+  var $found
+  $found = 0
+
+  if (@s->parity == 0) {
+    // first portal
+    say looking for portal 0
+    for nearest @marker.iraoPortalMarker[distance < 3][->portalid < 0] {
+      $found = 1
+
+      $posx = @s->posicaox
+      $posy = @s->posicaoy
+      $posz = @s->posicaoz
+      $rotx = @s->rotx
+      $roty = @s->roty
+
+      @s->portalid = $seq
+      @s->player = $playerid
+    }
+
+    if ($found == 1) {
+      // found a portal
+      say found a portal 1
+      @s->posicaox = $posx
+      @s->posicaoy = $posy
+      @s->posicaoz = $posz
+      @s->rotx = $rotx
+      @s->roty = $roty
+
+      @s->parity = 1
+    }
+  } else {
+    if (@s->parity == 1) {
+      // second portal
+      say looking for portal 1
+      $posx = @s->posicaox
+      $posy = @s->posicaoy
+      $posz = @s->posicaoz
+      $rotx = @s->rotx
+      $roty = @s->roty
+
+      for nearest @marker.iraoPortalMarker[distance < 3][->portalid < 0] {
+        $found = 1
+        var $temp
+
+        $temp = @s->posicaox
+        @s->posicaox = $posx
+        $posx = $temp
+        $temp = @s->posicaoy
+        @s->posicaoy = $posy
+        $posy = $temp
+        $temp = @s->posicaoz
+        @s->posicaoz = $posz
+        $posz = $temp
+        $temp = @s->rotx
+        @s->rotx = $rotx
+        $rotx = $temp
+        $temp = @s->roty
+        @s->roty = $roty
+        $roty = $temp
+
+        @s->portalid = $seq
+        @s->player = $playerid
+      }
+
+      if ($found == 1) {
+        // found a portal
+        say found a portal 2
+        @s->posicaox = $posx
+        @s->posicaoy = $posy
+        @s->posicaoz = $posz
+        @s->rotx = $rotx
+        @s->roty = $roty
+
+        @s->parity = 2
+      }
+    } else {
+      // final binding
+      say looking for portal 2
+
+      $posx = @s->posicaox
+      $posy = @s->posicaoy
+      $posz = @s->posicaoz
+      $rotx = @s->rotx
+      $roty = @s->roty
+
+      for nearest @marker.iraoPortalMarker[distance < 3] {
+        if (@s->portalid == $seq) and if (@s->player == $playerid) {
+          $found = 1
+
+          @s->posicaox = $posx
+          @s->posicaoy = $posy
+          @s->posicaoz = $posz
+          @s->rotx = $rotx
+          @s->roty = $roty
+        }
+      }
+
+      if ($found == 1) {
+        // found a portal
+        say found portal 3
+
+        @s->portalseq += 1
+        @s->parity = 0
+      }
+    }
+  }
+
+  @s->clickdetect = 0
+}
+
 // Load
 function load #minecraft:load {
+  // load all unloaded players scoreboards
+  @a->id += 0
+  // TODO move to a setup func
+  /scoreboard players set $total {->id} 1
+  @a->portalseq += 0
+  @a->parity = 0
+  @a->clickdetect = 0
+
   /tellraw @a [{"text": "[IraoPortals]: yellow"}]
 }
 
 // Tick
 function loop #minecraft:tick {
+  // uniquely identify all users
+  for @a[->id = 0] {
+    say changing
+    /scoreboard players operation @s {->id} = $total {->id}
+    /scoreboard players add $total {->id} 1
+  }
+
+  // reset recipes
   /recipe take @a irao_portals:iraoportalrecipe
   /advancement revoke @a only irao_portals:iraoportalrecipeadv
   
+  // create markers for placed portals
   for @painting.iraoPortal!placedPortal {
     place_portal()
   }
 
+  // check for portal destruction and player collision
   for @marker.iraoPortalMarker {
     destroy_portal()
     teleport_player()
+  }
+
+  // portal linkage
+  for @a[->clickdetect > 0] {
+    handle_link()
   }
 }
