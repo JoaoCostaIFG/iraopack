@@ -10,6 +10,7 @@ score id
 score portalseq
 score parity
 score clickdetect minecraft.used:minecraft.carrot_on_a_stick
+score sneaking minecraft.custom:minecraft.sneak_time
 
 score portalid
 score player
@@ -23,7 +24,7 @@ score roty
 function recipe() {
   give @p painting{
     display: {
-      Name: json <span color=aqua bold=true>Irao Portal</span>,
+      Name: json <span color=aqua>Irao Portal</span>,
     },
     EntityTag: {
       Tags:["{.iraoPortal}"],
@@ -35,11 +36,17 @@ function recipe() {
 function linker_recipe() {
   give @p carrot_on_a_stick{
     display: {
-      Name: json <span color=aqua bold=true>Irao Portal Linker</span>,
+      Name: json <span color=aqua><b>Irao Portal Linker</b></span>,
     },
     EntityTag: {
       Tags:["{.iraoPortalLinker}"],
-    }
+    },
+    Enchantments: [
+      {
+        id:"minecraft:binding_curse",
+        lvl:1s,
+      }
+    ]
   }
   /clear @s minecraft:knowledge_book 1
 }
@@ -88,7 +95,7 @@ function destroy_portal() {
         Count: 1b,
         tag: {
           display: {
-            Name: json <span color=aqua bold=true>Irao Portal</span>,
+            Name: json <span color=aqua>Irao Portal</span>,
           },
           EntityTag: {
             Tags:["{.iraoPortal}"],
@@ -262,7 +269,7 @@ function load #minecraft:load {
   // TODO move to a setup func
   /scoreboard players set $total {->id} 1
   @a->portalseq += 0
-  @a->parity = 0
+  @a->parity += 0
   @a->clickdetect = 0
 
   /tellraw @a [{"text": "[IraoPortals]: yellow"}]
@@ -293,7 +300,23 @@ function loop #minecraft:tick {
   }
 
   // portal linkage
-  for @a[->clickdetect > 0] {
-    handle_link()
+  for @a[->clickdetect > 0]{SelectedItem:{id:"minecraft:carrot_on_a_stick",tag:{EntityTag:{Tags:["{.iraoPortalLinker}"]}}}} {
+    if (@s->sneaking > 0) {
+      say resetting
+      @s->parity = 0
+    } else {
+      handle_link()
+      if (@s->parity == 0) {
+        /item replace entity @s weapon.mainhand with carrot_on_a_stick{display:{Name:'{"text":"Irao Portal Linker","color":"aqua","bold":true}'},Enchantments:[{id:"minecraft:binding_curse",lvl:1s}],EntityTag:{Tags:[{.iraoPortalLinker}]}}
+      } else {
+        if (@s->parity == 1) {
+          /item replace entity @s weapon.mainhand with carrot_on_a_stick{display:{Name:'{"text":"Irao Portal Linker I","color":"aqua","bold":true}'},Enchantments:[{id:"minecraft:binding_curse",lvl:1s}],EntityTag:{Tags:[{.iraoPortalLinker}]}}
+        } else {
+          /item replace entity @s weapon.mainhand with carrot_on_a_stick{display:{Name:'{"text":"Irao Portal Linker II","color":"aqua","bold":true}'},Enchantments:[{id:"minecraft:binding_curse",lvl:1s}],EntityTag:{Tags:[{.iraoPortalLinker}]}}
+        }
+    }
+    }
   }
+  // reset sneak detector
+  @a->sneaking = 0
 }
