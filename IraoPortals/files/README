@@ -1,1 +1,11 @@
-This is the readme file for the users of the datapack.
+# Irao Portals
+
+Portals made of minecraft paintings.
+
+## TODO
+
+- Use marker instead of area of effects
+- Use normal paintings instead of summoning them
+- Teleport between dimensions
+- Deal with unloaded chunks
+- Multiple portal tunnels
