@@ -89,10 +89,13 @@ function place_portal() {
   say Placing portal
 
   // save portal info
-  @s->id = 0
-  @s->posicaox = @s::Pos[0]
-  @s->posicaoy = @s::Pos[1]
-  @s->posicaoz = @s::Pos[2]
+  forward 1 {
+    /tp @s ~ ~ ~
+    @s->id = 0
+    @s->posicaox = @s::Pos[0]
+    @s->posicaoy = @s::Pos[1]
+    @s->posicaoz = @s::Pos[2]
+  }
 
   back 1 {
     /tp @s ~ ~ ~
@@ -271,34 +274,40 @@ function destroy_portal() {
 }
 
 function teleport_player() {
-  var $posx
-  $posx = @s->posicaox
-  var $posy
-  $posy = @s->posicaoy
-  var $posz
-  $posz = @s->posicaoz
+  var $myid
+  $myid = @s->id
 
+  // for each neaby player
   for @p[distance <= 2] {
-    say looking for pair teleporter
-
     /tag @s add TeleportPlayer
-    summon area_effect_cloud{
-      Tags:["TeleportTarget"],
-      Duration:1
-    } then {
-      @s::Pos[0] = 1d * $posx
-      @s::Pos[1] = 1d * $posy
-      @s::Pos[2] = 1d * $posz
-      /tp @a[tag=TeleportPlayer, limit=1] @s
-      /kill @s
+
+    // loop through all paintings (loaded chunks)
+    as(furthest @glow_item_frame.iraoPortalMarker.placedPortal) {
+      // if the ids match, we teleport
+      if ($myid == @s->id) {
+        var $posx
+        $posx = @s->posicaox
+        var $posy
+        $posy = @s->posicaoy
+        var $posz
+        $posz = @s->posicaoz
+
+        say looking for pair teleporter
+
+        summon area_effect_cloud{
+          Tags:["TeleportTarget"],
+          Duration:1
+        } then {
+          say tp
+          @s::Pos[0] = 1d * $posx
+          @s::Pos[1] = 1d * $posy
+          @s::Pos[2] = 1d * $posz
+          /tp @a[tag=TeleportPlayer, limit=1] @s
+          /tag @a[tag=TeleportPlayer, limit=1] remove TeleportPlayer
+          /kill @s
+        }
+      }
     }
-    /tag @s remove TeleportPlayer
-
-    // var $myid
-    // $myid =
-    // as(furthest @glow_item_frame.iraoPortalMarker.placedPortal) {
-
-    // }
   }
 }
 
