@@ -4,18 +4,11 @@ tag iraoPortalMarker
 tag placedPortal
 tag iraoPortal
 
-function load #minecraft:load {
-  /tellraw @a [{"text": "[IraoPortals]: yellow"}]
-}
-
-function loop #minecraft:tick {
-  /recipe take @a irao_portals:iraoportalrecipe
-  /advancement revoke @a only irao_portals:iraoportalrecipeadv
-  
-  for @e.iraoPortalMarker!placedPortal {
-    place_portal()
-  }
-}
+score parity
+score id
+score posicaox
+score posicaoy
+score posicaoz
 
 macro area_feeler(?max_x, ?max_y) {
   var $blockcount = 0
@@ -95,6 +88,12 @@ macro summon_painting(?motive="minecraft:kebab") {
 function place_portal() {
   say Placing portal
 
+  // save portal info
+  @s->id = 0
+  @s->posicaox = @s::Pos[0]
+  @s->posicaoy = @s::Pos[1]
+  @s->posicaoz = @s::Pos[2]
+
   back 1 {
     /tp @s ~ ~ ~
   }
@@ -142,7 +141,7 @@ function place_portal() {
         up 1 {
           when area_feeler(4, 2) then {
             left 1 {
-              // no random cause only 1 paiting available
+              // no random cause only 1 painting available
               summon_painting("minecraft:fighters")
             }
           } catch {
@@ -243,7 +242,7 @@ function place_portal() {
 function recipe() {
   give @p glow_item_frame{
     display: {
-      Name: json <span color=aqua italic=true bold=true>Irao Portal</span>,
+      Name: json <span color=aqua bold=true>Irao Portal</span>,
     },
     EntityTag: {
       Silent:1b,
@@ -251,12 +250,77 @@ function recipe() {
       Invisible:1b,
       Fixed:1b,
       Tags:["{.iraoPortalMarker}"],
-      Item: {
-        id:"minecraft:glow_item_frame",
-        Count:1b,
-        Name: json <span color=aqua italic=true bold=true>Irao Portal</span>,
-      }
     }
   }
   /clear @s minecraft:knowledge_book 1
+}
+
+function destroy_portal() {
+  forward 1 {
+    /tp @s ~ ~ ~
+    unless @painting.iraoPortal[distance < 1] {
+      say Portal died
+      /kill @s
+      // kill painting drop
+      /kill @e[type=minecraft:item,nbt={Item:{id:"minecraft:painting"}},sort=nearest,limit=1]
+      // drop item
+      recipe()
+    }
+  }
+  /tp @s ~ ~ ~
+}
+
+function teleport_player() {
+  var $posx
+  $posx = @s->posicaox
+  var $posy
+  $posy = @s->posicaoy
+  var $posz
+  $posz = @s->posicaoz
+
+  for @p[distance <= 2] {
+    say looking for pair teleporter
+
+    /tag @s add TeleportPlayer
+    summon area_effect_cloud{
+      Tags:["TeleportTarget"],
+      Duration:1
+    } then {
+      @s::Pos[0] = 1d * $posx
+      @s::Pos[1] = 1d * $posy
+      @s::Pos[2] = 1d * $posz
+      /tp @a[tag=TeleportPlayer, limit=1] @s
+      /kill @s
+    }
+    /tag @s remove TeleportPlayer
+
+    // var $myid
+    // $myid =
+    // as(furthest @glow_item_frame.iraoPortalMarker.placedPortal) {
+
+    // }
+  }
+}
+
+// Load
+function load #minecraft:load {
+  // ensure the scoreboard is instantiated
+  @s->parity = 0
+
+  /tellraw @a [{"text": "[IraoPortals]: yellow"}]
+}
+
+// Tick
+function loop #minecraft:tick {
+  /recipe take @a irao_portals:iraoportalrecipe
+  /advancement revoke @a only irao_portals:iraoportalrecipeadv
+  
+  for @glow_item_frame.iraoPortalMarker!placedPortal {
+    place_portal()
+  }
+
+  for @glow_item_frame.iraoPortalMarker.placedPortal {
+    destroy_portal()
+    teleport_player()
+  }
 }
