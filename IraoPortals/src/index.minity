@@ -282,7 +282,7 @@ function teleport_player() {
     /tag @s add TeleportPlayer
 
     // loop through all paintings (loaded chunks)
-    as(furthest @glow_item_frame.iraoPortalMarker.placedPortal) {
+    as(furthest @glow_item_frame.iraoPortalMarker.placedPortal[distance > 2]) {
       // if the ids match, we teleport
       if ($myid == @s->id) {
         var $posx
