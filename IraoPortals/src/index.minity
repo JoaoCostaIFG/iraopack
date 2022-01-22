@@ -54,7 +54,7 @@ function place_portal() {
     tag @s iraoPortalMarker
     @s->portalid = -1
     @s->player = 0
-    forward 1 {
+    forward 1.5 {
       /tp @s ~ ~ ~
       @s->posicaox = @s::Pos[0]
       @s->posicaoy = @s::Pos[1]
