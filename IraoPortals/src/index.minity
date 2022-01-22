@@ -1,24 +1,12 @@
 namespace irao_portals
 
+import "./tags_scores.minity"
+import "./tp_marker.minity"
+
 tag iraoPortal
 tag placedPortal
 tag iraoPortalMarker
 tag iraoPortalLinker
-
-// player scores
-score id
-score portalseq
-score parity
-score clickdetect minecraft.used:minecraft.carrot_on_a_stick
-score sneaking minecraft.custom:minecraft.sneak_time
-
-score portalid
-score player
-score posicaox
-score posicaoy
-score posicaoz
-score rotx
-score roty
 
 // Recipes
 function recipe() {
@@ -103,36 +91,19 @@ function destroy_portal() {
   }
 }
 
-function teleport_player() {
-  if (@s->portalid > 0) {
-    var $posx
-    $posx = @s->posicaox
-    var $posy
-    $posy = @s->posicaoy
-    var $posz
-    $posz = @s->posicaoz
-    var $rotx
-    $rotx = @s->rotx
-    var $roty
-    $roty = @s->roty
+// Detect player dimension
+function detect_dim() {
+  // The lines below could work, but for some reason the overworld and the_end conflict with each other.
+  // A player in the overworld is detected as both in the overworld and in the_end
+  // /execute in minecraft:overworld if entity @s[distance=0] run function irao_portals:store_dimension_overworld
+  // /execute in minecraft:the_nether if entity @s[distance=0] run function irao_portals:store_dimension_nether
+  // /execute in minecraft:the_end if entity @s[distance=0] run function irao_portals:store_dimension_end
+  // This other command stores the dimension ID length in the scoreboard
+  // 17 - the_end
+  // 19 - overworld
+  // 20 - the_nether
 
-    // for each neaby player
-    for @p[distance <= 1] {
-      /tag @s add TeleportPlayer
-      summon marker{
-        Tags:["TeleportTarget"],
-      } then {
-        @s::Pos[0] = 1d * $posx
-        @s::Pos[1] = 1d * $posy
-        @s::Pos[2] = 1d * $posz
-        @s::Rotation[0] = 1f * $rotx
-        @s::Rotation[1] = 1f * $roty
-        /tp @a[tag=TeleportPlayer, limit=1] @s
-        /tag @a[tag=TeleportPlayer, limit=1] remove TeleportPlayer
-        /kill @s
-      }
-    }
-  }
+  /execute store result score @s {->dimension} run data get entity @s Dimension
 }
 
 function handle_link() {
@@ -146,12 +117,14 @@ function handle_link() {
   var $posz
   var $rotx
   var $roty
+  var $dim
 
   var $found
   $found = 0
 
   if (@s->parity == 0) {
     // first portal
+
     for nearest @marker.iraoPortalMarker[distance < 3][->portalid < 0] {
       $found = 1
       /particle minecraft:happy_villager ~ ~ ~ 0.3 0.3 0.3 0.5 10 normal
@@ -169,13 +142,16 @@ function handle_link() {
 
     if ($found == 1) {
       // found a portal
+      @s->parity = 1
+
       @s->posicaox = $posx
       @s->posicaoy = $posy
       @s->posicaoz = $posz
       @s->rotx = $rotx
       @s->roty = $roty
 
-      @s->parity = 1
+      // save player current dimension
+      detect_dim()
     }
   } else {
     if (@s->parity == 1) {
@@ -185,6 +161,7 @@ function handle_link() {
       $posz = @s->posicaoz
       $rotx = @s->rotx
       $roty = @s->roty
+      $dim = @s->dimension
 
       for nearest @marker.iraoPortalMarker[distance < 3][->portalid < 0] {
         $found = 1
@@ -209,19 +186,24 @@ function handle_link() {
         @s->roty = $roty
         $roty = $temp
 
+        @s->dimension = $dim
+
         @s->portalid = $seq
         @s->player = $playerid
       }
 
       if ($found == 1) {
         // found a portal
+        @s->parity = 2
+
         @s->posicaox = $posx
         @s->posicaoy = $posy
         @s->posicaoz = $posz
         @s->rotx = $rotx
         @s->roty = $roty
 
-        @s->parity = 2
+        // save player current dimension
+        detect_dim()
       }
     } else {
       // final binding
@@ -230,6 +212,7 @@ function handle_link() {
       $posz = @s->posicaoz
       $rotx = @s->rotx
       $roty = @s->roty
+      $dim = @s->dimension
 
       for nearest @marker.iraoPortalMarker[distance < 3] {
         if (@s->portalid == $seq) and if (@s->player == $playerid) {
@@ -242,13 +225,14 @@ function handle_link() {
           @s->posicaoz = $posz
           @s->rotx = $rotx
           @s->roty = $roty
+          @s->dimension = $dim
         }
       }
 
       if ($found == 1) {
         // found a portal
-        @s->portalseq += 1
         @s->parity = 0
+        @s->portalseq += 1
       }
     }
   }
@@ -306,7 +290,7 @@ function loop #minecraft:tick {
         } else {
           /item replace entity @s weapon.mainhand with carrot_on_a_stick{display:{Name:'{"text":"Irao Portal Linker II","color":"aqua","bold":true}'},Enchantments:[{id:"minecraft:binding_curse",lvl:1s}],EntityTag:{Tags:[{.iraoPortalLinker}]}}
         }
-    }
+      }
     }
   }
   // reset sneak detector

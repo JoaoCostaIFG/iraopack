@@ -1,0 +1,59 @@
+namespace irao_portals
+
+import "./tags_scores.minity"
+
+var $posx
+var $posy
+var $posz
+var $rotx
+var $roty
+
+function tp_to_marker() {
+  /tag @s add TeleportPlayer
+
+  summon marker{
+    Tags:["TeleportTarget"],
+  } then {
+    @s::Pos[0] = 1d * $posx
+    @s::Pos[1] = 1d * $posy
+    @s::Pos[2] = 1d * $posz
+    @s::Rotation[0] = 1f * $rotx
+    @s::Rotation[1] = 1f * $roty
+    /tp @a[tag=TeleportPlayer, limit=1] @s
+
+    /tag @a[tag=TeleportPlayer, limit=1] remove TeleportPlayer
+    /kill @s
+  }
+}
+
+function teleport_player() {
+  if (@s->portalid > 0) {
+    $posx = @s->posicaox
+    $posy = @s->posicaoy
+    $posz = @s->posicaoz
+    $rotx = @s->rotx
+    $roty = @s->roty
+
+    var $dim
+    $dim = @s->dimension
+
+    // for each neaby player
+    for nearest @p[distance <= 1] {
+      say teleport
+      if ($dim == 17) {
+        say end
+        /execute in minecraft:the_end run function irao_portals:tp_to_marker
+      } else {
+        if ($dim == 19) {
+          say overworld
+          /execute in minecraft:overworld run function irao_portals:tp_to_marker
+        } else {
+          if ($dim == 20) {
+            say nether
+            /execute in minecraft:the_nether run function irao_portals:tp_to_marker
+          }
+        }
+      }
+    }
+  }
+}

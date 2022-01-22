@@ -1,0 +1,18 @@
+namespace irao_portals
+
+// player scores
+score id
+score portalseq
+score parity
+score clickdetect minecraft.used:minecraft.carrot_on_a_stick
+score sneaking minecraft.custom:minecraft.sneak_time
+
+// portal scores
+score portalid
+score player
+score posicaox
+score posicaoy
+score posicaoz
+score rotx
+score roty
+score dimension
