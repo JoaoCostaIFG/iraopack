@@ -155,6 +155,7 @@ function handle_link() {
     for nearest @marker.iraoPortalMarker[distance < 3][->portalid < 0] {
       $found = 1
       /particle minecraft:happy_villager ~ ~ ~ 0.3 0.3 0.3 0.5 10 normal
+      /playsound minecraft:block.amethyst_block.break master @p
 
       $posx = @s->posicaox
       $posy = @s->posicaoy
@@ -188,6 +189,7 @@ function handle_link() {
       for nearest @marker.iraoPortalMarker[distance < 3][->portalid < 0] {
         $found = 1
         /particle minecraft:portal ~ ~ ~ 0 0 0 1 500 normal
+        /playsound minecraft:item.totem.use master @p
 
         var $temp
 
@@ -233,6 +235,7 @@ function handle_link() {
         if (@s->portalid == $seq) and if (@s->player == $playerid) {
           $found = 1
           /particle minecraft:portal ~ ~ ~ 0 0 0 1 500 normal
+          /playsound minecraft:item.totem.use master @p
 
           @s->posicaox = $posx
           @s->posicaoy = $posy
