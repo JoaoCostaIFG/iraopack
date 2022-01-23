@@ -54,17 +54,17 @@ function place_portal() {
     tag @s iraoPortalMarker
     @s->portalid = -1
     @s->player = 0
-    forward 1.5 {
+    @s::Rotation[0] = 1f * $rotx
+    @s->rotx = @s::Rotation[0]
+    @s::Rotation[1] = 1f * $roty
+    @s->roty = @s::Rotation[1]
+    forward 2.0 {
       /tp @s ~ ~ ~
       @s->posicaox = @s::Pos[0]
       @s->posicaoy = @s::Pos[1]
       @s->posicaoz = @s::Pos[2]
     }
     /tp @s ~ ~ ~
-    @s::Rotation[0] = 1f * $rotx
-    @s->rotx = @s::Rotation[0]
-    @s::Rotation[1] = 1f * $roty
-    @s->roty = @s::Rotation[1]
   }
 }
 

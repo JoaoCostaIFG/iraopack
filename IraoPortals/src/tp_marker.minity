@@ -9,7 +9,6 @@ var $rotx
 var $roty
 
 function tp_to_marker() {
-  say teleporting
   /tag @s add TeleportPlayer
 
   summon marker{
@@ -42,18 +41,15 @@ function teleport_player() {
     for nearest @p[distance <= 1] {
       //tp_to_marker()
       if ($dim == 17) {
-        say end
-        // /execute in minecraft:the_end run function irao_portals:tp_to_marker
+        /execute in minecraft:the_end run function irao_portals:tp_to_marker
       } else {
         if ($dim == 19) {
-          say overworld
           // /execute in minecraft:overworld run tp @s 0 0 0
-          tp_to_marker()
+          /execute in minecraft:overworld run function irao_portals:tp_to_marker
         } else {
           if ($dim == 20) {
-            say nether
             // /execute in minecraft:the_nether run tp @s 0 0 0
-            tp_to_marker()
+            /execute in minecraft:the_nether run function irao_portals:tp_to_marker
           }
         }
       }
