@@ -2,28 +2,27 @@ namespace irao_portals
 
 import "./tags_scores.minity"
 
+tag TeleportTarget
+
 var $posx
 var $posy
 var $posz
 var $rotx
 var $roty
 
+// Thx: https://teddit.net/r/MinecraftCommands/comments/ocqj07/datapacktutorial_teleport_player_with_scoreboard/
 function tp_to_marker() {
-  /tag @s add TeleportPlayer
+  /tp 0 0 0
+  @s::Pos[0] = 1d * $posx
+  @s::Pos[1] = 1d * $posy
+  @s::Pos[2] = 1d * $posz
+  @s::Rotation[0] = 1f * $rotx
+  @s::Rotation[1] = 1f * $roty
 
-  summon marker{
-    Tags:["TeleportTarget"],
-  } then {
-    @s::Pos[0] = 1d * $posx
-    @s::Pos[1] = 1d * $posy
-    @s::Pos[2] = 1d * $posz
-    @s::Rotation[0] = 1f * $rotx
-    @s::Rotation[1] = 1f * $roty
-    /tp @a[tag=TeleportPlayer, limit=1] @s
+  // includes rotation
+  /execute positioned as @s rotated as @s run tp @a[tag=TeleportPlayer, limit=1] ~ ~ ~ ~ ~
 
-    /tag @a[tag=TeleportPlayer, limit=1] remove TeleportPlayer
-    /kill @s
-  }
+  /kill @s
 }
 
 function teleport_player() {
@@ -39,20 +38,29 @@ function teleport_player() {
 
     // for each neaby player
     for nearest @p[distance <= 1] {
-      //tp_to_marker()
-      if ($dim == 17) {
-        /execute in minecraft:the_end run function irao_portals:tp_to_marker
-      } else {
-        if ($dim == 19) {
-          // /execute in minecraft:overworld run tp @s 0 0 0
-          /execute in minecraft:overworld run function irao_portals:tp_to_marker
+      /tag @s add TeleportPlayer
+      summon marker{
+        Tags:["{.TeleportTarget}"],
+      }
+
+      as(@marker.TeleportTarget) {
+        if ($dim == 17) {
+          say end
+          /execute in minecraft:the_end run function irao_portals:tp_to_marker
         } else {
-          if ($dim == 20) {
-            // /execute in minecraft:the_nether run tp @s 0 0 0
-            /execute in minecraft:the_nether run function irao_portals:tp_to_marker
+          if ($dim == 19) {
+            say overworld
+            /execute in minecraft:overworld run function irao_portals:tp_to_marker
+          } else {
+            if ($dim == 20) {
+              say nether
+              /execute in minecraft:the_nether run function irao_portals:tp_to_marker
+            }
           }
         }
       }
+
+      /tag @a[tag=TeleportPlayer, limit=1] remove TeleportPlayer
     }
   }
 }
