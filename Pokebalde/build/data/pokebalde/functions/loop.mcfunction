@@ -1,1 +1,0 @@
-execute as @a[scores={--pokebalde-clickdetect=1..}] at @s run function zzz_minity:pokebalde/_b_95
