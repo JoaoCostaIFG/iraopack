@@ -240,6 +240,19 @@ function handle_link() {
   @s->clickdetect = 0
 }
 
+// portals can be named by dropping a nametag near them
+function name_portal() {
+  as nearest @item[distance < 5]{Item:{id:"minecraft:name_tag"}} {
+    // make name visible
+    nearest @painting.iraoPortal.placedPortal::CustomNameVisible = 1b
+    // clear name so it can renamed (remove doesn't wokr, only merge)
+    nearest @painting.iraoPortal.placedPortal::CustomName = ""
+    // set name and use name tag
+    nearest @painting.iraoPortal.placedPortal::CustomName = @s::Item.tag.display.Name
+    /kill @s
+  }
+}
+
 // Load
 function load #minecraft:load {
   // load all unloaded players scoreboards
@@ -270,9 +283,10 @@ function loop #minecraft:tick {
     place_portal()
   }
 
-  // check for portal destruction and player collision
+  // check for portal destruction, portal (re)naming, and player collision
   for @marker.iraoPortalMarker {
     destroy_portal()
+    name_portal()
     teleport_player()
   }
 

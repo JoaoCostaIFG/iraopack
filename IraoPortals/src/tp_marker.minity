@@ -45,15 +45,12 @@ function teleport_player() {
 
       as(@marker.TeleportTarget) {
         if ($dim == 17) {
-          say end
           /execute in minecraft:the_end run function irao_portals:tp_to_marker
         } else {
           if ($dim == 19) {
-            say overworld
             /execute in minecraft:overworld run function irao_portals:tp_to_marker
           } else {
             if ($dim == 20) {
-              say nether
               /execute in minecraft:the_nether run function irao_portals:tp_to_marker
             }
           }
