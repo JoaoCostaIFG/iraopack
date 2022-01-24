@@ -236,8 +236,6 @@ function handle_link() {
       }
     }
   }
-
-  @s->clickdetect = 0
 }
 
 // portals can be named by dropping a nametag near them
@@ -291,18 +289,21 @@ function loop #minecraft:tick {
   }
 
   // portal linkage
-  for @a[->clickdetect > 0]{SelectedItem:{id:"minecraft:carrot_on_a_stick",tag:{EntityTag:{Tags:["{.iraoPortalLinker}"]}}}} {
-    if (@s->sneaking > 0) {
-      @s->parity = 0
-    } else {
-      handle_link()
-      if (@s->parity == 0) {
-        /item replace entity @s weapon.mainhand with carrot_on_a_stick{display:{Name:'{"text":"Irao Portal Linker","color":"aqua","bold":true}'},Enchantments:[{id:"minecraft:binding_curse",lvl:1s}],EntityTag:{Tags:[{.iraoPortalLinker}]}}
+  for @a[->clickdetect > 0] {
+    @s->clickdetect = 0
+    if (@s{SelectedItem:{id:"minecraft:carrot_on_a_stick",tag:{EntityTag:{Tags:["{.iraoPortalLinker}"]}}}}) {
+      if (@s->sneaking > 0) {
+        @s->parity = 0
       } else {
-        if (@s->parity == 1) {
-          /item replace entity @s weapon.mainhand with carrot_on_a_stick{display:{Name:'{"text":"Irao Portal Linker I","color":"aqua","bold":true}'},Enchantments:[{id:"minecraft:binding_curse",lvl:1s}],EntityTag:{Tags:[{.iraoPortalLinker}]}}
+        handle_link()
+        if (@s->parity == 0) {
+          /item replace entity @s weapon.mainhand with carrot_on_a_stick{display:{Name:'{"text":"Irao Portal Linker","color":"aqua","bold":true}'},Enchantments:[{id:"minecraft:binding_curse",lvl:1s}],EntityTag:{Tags:[{.iraoPortalLinker}]}}
         } else {
-          /item replace entity @s weapon.mainhand with carrot_on_a_stick{display:{Name:'{"text":"Irao Portal Linker II","color":"aqua","bold":true}'},Enchantments:[{id:"minecraft:binding_curse",lvl:1s}],EntityTag:{Tags:[{.iraoPortalLinker}]}}
+          if (@s->parity == 1) {
+            /item replace entity @s weapon.mainhand with carrot_on_a_stick{display:{Name:'{"text":"Irao Portal Linker I","color":"aqua","bold":true}'},Enchantments:[{id:"minecraft:binding_curse",lvl:1s}],EntityTag:{Tags:[{.iraoPortalLinker}]}}
+          } else {
+            /item replace entity @s weapon.mainhand with carrot_on_a_stick{display:{Name:'{"text":"Irao Portal Linker II","color":"aqua","bold":true}'},Enchantments:[{id:"minecraft:binding_curse",lvl:1s}],EntityTag:{Tags:[{.iraoPortalLinker}]}}
+          }
         }
       }
     }
