@@ -1,0 +1,187 @@
+namespace pokebalde
+
+?max_range = 80
+
+score range
+score clickdetect minecraft.used:minecraft.carrot_on_a_stick
+
+tag raycasting
+
+function recipe() {
+  /give @p carrot_on_a_stick{display:{Name:'{"text":"Pokebalde","color":"red","bold":true}'},HideFlags:5,Unbreakable:1b,CustomModelData:134279,pokebalde:1b,Enchantments:[{id:"minecraft:silk_touch",lvl:1s}]} 1
+}
+
+macro egg_summon(?egg) {
+  summon item{
+    Item: {
+      id: ?egg,
+      Count: 1b,
+      tag: {
+        EntityTag: {
+          Tags: ["pokebalde_spawnegg"],
+        }
+      }
+    },
+    Tags:["pokebalde_egg"],
+  } then {
+    // save the data on egg
+    /data modify entity @s Item.tag.EntityTag merge from storage pokebalde:capture Entity
+
+    // clean storage
+    /data remove storage pokebalde:capture Entity
+  }
+}
+
+function collide() {
+  @a.raycasting->range = ?max_range
+
+  // particles :D
+  /particle minecraft:happy_villager ^ ^.25 ^ 0.3 0.3 0.3 0.5 10 normal
+  /particle minecraft:portal ^ ^ ^ 0 0 0 1 50 normal
+  // play bucket sound
+  /playsound item.bucket.fill master @s
+
+  // store the create data in storage
+  /data modify storage pokebalde:capture Entity merge from entity @s {}
+  // remove data that would make things difficulty
+  /data remove storage pokebalde:capture Entity.Pos
+  // data remove storage pokebalde:capture Entity.Tags
+  /data remove storage pokebalde:capture Entity.Motion
+  /data remove storage pokebalde:capture Entity.Rotation
+
+  // create the egg based on entity type
+  // this should be a switch-case or if-elif stuff but the identation is awful
+  if (@s[type == minecraft:axolotl]) {
+    egg_summon("minecraft:axolotl_spawn_egg")
+  }
+  if (@s[type == minecraft:bat]) {
+    egg_summon("minecraft:bat_spawn_egg")
+  }
+  if (@s[type == minecraft:bee]) {
+    egg_summon("minecraft:bee_spawn_egg")
+  }
+  if (@s[type == minecraft:cat]) {
+    egg_summon("minecraft:cat_spawn_egg")
+  }
+  if (@s[type == minecraft:chicken]) {
+    egg_summon("minecraft:chicken_spawn_egg")
+  }
+  if (@s[type=minecraft:cod]) {
+    egg_summon("minecraft:cod_spawn_egg")
+  }
+  if (@s[type == minecraft:cow]) {
+    egg_summon("minecraft:cow_spawn_egg")
+  }
+  if (@s[type == minecraft:dolphin]) {
+    egg_summon("minecraft:dolphin_spawn_egg")
+  }
+  if (@s[type=minecraft:donkey]) {
+    egg_summon("minecraft:donkey_spawn_egg")
+  }
+  if (@s[type=minecraft:fox]) {
+    egg_summon("minecraft:fox_spawn_egg")
+  } 
+  if (@s[type=minecraft:horse]) {
+    egg_summon("minecraft:horse_spawn_egg")
+  }
+  if (@s[type=minecraft:llama]) {
+    egg_summon("minecraft:llama_spawn_egg")
+  }
+  if (@s[type=minecraft:mooshroom]) {
+    egg_summon("minecraft:mooshroom_spawn_egg")
+  }
+  if (@s[type=minecraft:mule]) {
+    egg_summon("minecraft:mule_spawn_egg")
+  }
+  if (@s[type=minecraft:panda]) {
+    egg_summon("minecraft:panda_spawn_egg")
+  }
+  if (@s[type=minecraft:parrot]) {
+    egg_summon("minecraft:parrot_spawn_egg")
+  }
+  if (@s[type=minecraft:pig]) {
+    egg_summon("minecraft:pig_spawn_egg")
+  }
+  if (@s[type=minecraft:polar_bear]) {
+    egg_summon("minecraft:polar_bear_spawn_egg")
+  }
+  if (@s[type=minecraft:pufferfish]) {
+    egg_summon("minecraft:pufferfish_spawn_egg")
+  }
+  if (@s[type=minecraft:rabbit]) {
+    egg_summon("minecraft:rabbit_spawn_egg")
+  }
+  if (@s[type=minecraft:salmon]) {
+    egg_summon("minecraft:salmon_spawn_egg")
+  }
+  if (@s[type=minecraft:sheep]) {
+    egg_summon("minecraft:sheep_spawn_egg")
+  }
+  if (@s[type=minecraft:skeleton_horse]) {
+    egg_summon("minecraft:skeleton_horse_spawn_egg")
+  }
+  if (@s[type=minecraft:squid]) {
+    egg_summon("minecraft:squid_spawn_egg")
+  }
+  if (@s[type=minecraft:squid]) {
+    egg_summon("minecraft:squid_spawn_egg")
+  }
+  if (@s[type=minecraft:strider]) {
+    egg_summon("minecraft:strider_spawn_egg")
+  }
+  if (@s[type=minecraft:trader_llama]) {
+    egg_summon("minecraft:trader_llama_spawn_egg")
+  }
+  if (@s[type=minecraft:tropical_fish]) {
+    egg_summon("minecraft:tropical_fish_spawn_egg")
+  }
+  if (@s[type=minecraft:turtle]) {
+    egg_summon("minecraft:turtle_spawn_egg")
+  }
+  if (@s[type=minecraft:villager]) {
+    egg_summon("minecraft:villager_spawn_egg")
+  }
+  if (@s[type=minecraft:wolf]) {
+    egg_summon("minecraft:wolf_spawn_egg")
+  }
+
+  // make the original mob go poof, silently with no loot dropped
+  /tp @s ~ ~-227 ~
+  /data merge entity @s {Silent:1b,DeathLootTable:"",Health:0f}
+  /kill @s
+}
+
+function raycast() {
+  tag @s raycasting
+  /execute as @e[type=#pokebalde:eggable,dx=0] positioned ~-0.99 ~-0.99 ~-0.99 if entity @s[dx=0] positioned ~0.99 ~0.99 ~0.99 run function pokebalde:collide
+  untag @s raycasting
+
+  @s->range += 1
+  // debug ray
+  // /particle minecraft:smoke ~ ~ ~ 0 0 0 0 0
+
+  if (@s->range < ?max_range) and if (#pokebalde:allowed) {
+    /execute positioned ^ ^ ^0.1 rotated ~ ~ run function pokebalde:raycast
+  }
+}
+
+// Load
+function load #minecraft:load {
+  @a->clickdetect = 0
+  @a->range = 0
+
+  /tellraw @a [{"text": "[Pokebalde]: yellow"}]
+}
+
+// Tick
+function loop #minecraft:tick {
+  for @a[->clickdetect > 0] {
+    @s->clickdetect = 0
+    if (@s{SelectedItem:{id:"minecraft:carrot_on_a_stick",tag:{pokebalde:1b}}}) {
+      @s->range = 0
+      /execute anchored eyes positioned ^ ^ ^ run function pokebalde:raycast
+    }
+  }
+
+  // execute as @e[tag=pokebalde_feeler] at @s run function iraopack:pokebalde_action
+}
