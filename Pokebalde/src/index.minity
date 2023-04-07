@@ -81,6 +81,9 @@ function collide() {
   if (@s[type=minecraft:fox]) {
     egg_summon("minecraft:fox_spawn_egg")
   } 
+  if (@s[type=minecraft:goat]) {
+    egg_summon("minecraft:goat_spawn_egg")
+  } 
   if (@s[type=minecraft:horse]) {
     egg_summon("minecraft:horse_spawn_egg")
   }
